@@ -6,16 +6,22 @@ import javax.persistence.*;
 @Table(name = "mapper")
 public class Mapper {
 
-    Mapper(String actualUrl, String shortenUrl) {
-        this.actualUrl = actualUrl;
-        this.shortenUrl = shortenUrl;
+    public Mapper() {
+
+    }
+
+    public Mapper(final String key, final String value, final String timeStamp) {
+        this.key = key;
+        this.value = value;
+        this.timeStamp = timeStamp;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private String actualUrl;
-    private String shortenUrl;
+    private String timeStamp;
+    private String key;
+    private String value;
 
     public long getId() {
         return id;
@@ -25,19 +31,27 @@ public class Mapper {
         this.id = id;
     }
 
-    public String getActualUrl() {
-        return actualUrl;
+    public String getTimeStamp() {
+        return timeStamp;
     }
 
-    public void setActualUrl(String actualUrl) {
-        this.actualUrl = actualUrl;
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
-    public String getShortenUrl() {
-        return shortenUrl;
+    public String getKey() {
+        return key;
     }
 
-    public void setShortenUrl(String shortenUrl) {
-        this.shortenUrl = shortenUrl;
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }

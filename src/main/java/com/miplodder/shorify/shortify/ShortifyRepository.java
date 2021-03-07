@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ShortifyRepository extends JpaRepository<Mapper, Object> {
 
+    Mapper findByKey(String key);
 }
