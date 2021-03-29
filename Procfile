@@ -1,1 +1,1 @@
-web: java -Dserver.port=13800 $JAVA_OPTS -jar build/libs/shortify-0.0.1-SNAPSHOT.jar
+web: java -jar build/libs/shortify-0.0.1-SNAPSHOT.jar
