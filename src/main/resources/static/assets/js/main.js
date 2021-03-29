@@ -25,8 +25,10 @@ async function shortenLink(e, form) {
   const response = await performPostHttpRequest('/shortify', headers, jsonFormData);
   console.log(response);
   // 2.5 Inform user of result
+
   if (response) {
     //window.location = '/success.html'
+    document.querySelector("#success-message").innerHTML= "Your shorten link is "+ response.value;
   } else {
     alert('An Error Occurred');
   }
