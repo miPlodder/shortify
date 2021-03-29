@@ -3,11 +3,12 @@ package com.miplodder.shorify.shortify;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.Date;
 
 @Controller
@@ -16,18 +17,28 @@ public class ShortifyController {
     @Autowired
     ShortifyRepository shortifyRepository;
 
-    @GetMapping(value = "k/{key}", produces = MediaType.ALL_VALUE)
+    @GetMapping(value = "k/{value}", produces = MediaType.ALL_VALUE)
     public @ResponseBody
-    String test(@PathVariable("key") String key) {
-        System.out.println("key");
-        return shortifyRepository.findByKey(key).getValue();
+    void test(@PathVariable("value") String value, HttpServletResponse httpServletResponse) throws IOException {
+        System.out.println("Executing /k/{value} endpoint");
+        Mapper mapper = shortifyRepository.findByValue(value);
+        if (mapper == null) {
+            httpServletResponse.sendRedirect("/");
+            return;
+        }
+        String key = mapper.getKey();
+        System.out.println("Redirecting to url: " + key);
+        httpServletResponse.sendRedirect(key);
     }
 
-    @PostMapping(value = "/shorten")
+    @PostMapping(value = "/shortify")
     public @ResponseBody
-    String postMapping() {
-        System.out.println("inside");
-        shortifyRepository.save(new Mapper("test123", "test123", (new Date()).toString()));
-        return "Hellow World";
+    ShortifyResponse postMapping(@RequestBody ShortifyRequest shortifyRequest, HttpServletRequest httpServletRequest) {
+        System.out.println("Executing /shortify endpoint");
+        String value = Base64.getEncoder().encodeToString(shortifyRequest.getKey().getBytes());
+        Mapper mapper = shortifyRepository.save(new Mapper(shortifyRequest.getKey(), value, (new Date()).toString()));
+        ShortifyResponse shortifyResponse = new ShortifyResponse();
+        shortifyResponse.setValue(httpServletRequest.getRequestURL() + mapper.getValue());
+        return shortifyResponse;
     }
 }

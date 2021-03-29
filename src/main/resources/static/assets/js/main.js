@@ -1,78 +1,66 @@
-/**
-* Template Name: Maundy - v4.0.1
-* Template URL: https://bootstrapmade.com/maundy-free-coming-soon-bootstrap-theme/
-* Author: BootstrapMade.com
-* License: https://bootstrapmade.com/license/
-*/
-(function() {
-  "use strict";
+//import FetchService from './service/FetchService';
 
-  /**
-   * Easy selector helper function
-   */
-  const select = (el, all = false) => {
-    el = el.trim()
-    if (all) {
-      return [...document.querySelectorAll(el)]
-    } else {
-      return document.querySelector(el)
-    }
+/*-- Objects --*/
+//const fetchService = new FetchService();
+/*-- /Objects --*/
+
+const myForm = document.querySelector("#myForm");
+if (myForm) {
+  myForm.addEventListener("submit", function(e) {
+    console.log("Adding Event Listener on myForm");
+    shortenLink(e, this);
+  });
+}
+
+async function shortenLink(e, form) {
+  // 1. Prevent reloading of page
+  e.preventDefault();
+  // 2. Submit the form
+  // 2.1 User Interaction
+  // 2.2 Build JSON body
+  const jsonFormData = buildJsonFormData(form);
+  // 2.3 Build Headers
+  const headers = buildHeaders();
+  // 2.4 Request & Response
+  const response = await performPostHttpRequest('/shortify', headers, jsonFormData);
+  console.log(response);
+  // 2.5 Inform user of result
+  if (response) {
+    //window.location = '/success.html'
+  } else {
+    alert('An Error Occurred');
   }
+}
 
-  /**
-   * Easy event listener function
-   */
-  const on = (type, el, listener, all = false) => {
-    let selectEl = select(el, all)
-    if (selectEl) {
-      if (all) {
-        selectEl.forEach(e => e.addEventListener(type, listener))
-      } else {
-        selectEl.addEventListener(type, listener)
-      }
-    }
+function buildHeaders() {
+  const headers = {
+    "Content-Type": "application/json"
+  };
+  return headers;
+}
+
+function buildJsonFormData(form) {
+  const jsonFormData = {};
+  for (const pair of new FormData(form)) {
+    jsonFormData[pair[0]] = pair[1];
   }
+  return jsonFormData;
+}
 
-  /**
-   * Easy on scroll event listener 
-   */
-  const onscroll = (el, listener) => {
-    el.addEventListener('scroll', listener)
+async function performPostHttpRequest(fetchLink, headers, body) {
+  if (!fetchLink || !headers || !body) {
+    throw new Error("One or more  POST request parameters was not passed");
   }
-
-  /**
-   * Back to top button
-   */
-  let backtotop = select('.back-to-top')
-  if (backtotop) {
-    const toggleBacktotop = () => {
-      if (window.scrollY > 100) {
-        backtotop.classList.add('active')
-      } else {
-        backtotop.classList.remove('active')
-      }
-    }
-    window.addEventListener('load', toggleBacktotop)
-    onscroll(document, toggleBacktotop)
+  try {
+    const rawResponse = await fetch(fetchLink, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(body)
+    });
+    const content = await rawResponse.json();
+    return content;
+  } catch(err) {
+    console.error('Error at fetch POST: '+ err);
+    throw err;
   }
-
-  /**
-   * Countdown timer
-   */
-  let countdown = select('.countdown');
-  const output = countdown.innerHTML;
-
-  const countDownDate = function() {
-    let timeleft = new Date(countdown.getAttribute('data-count')).getTime() - new Date().getTime();
-
-    let days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
-    let hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    let minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
-    let seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
-
-    countdown.innerHTML = output.replace('%d', days).replace('%h', hours).replace('%m', minutes).replace('%s', seconds);
-  }
-  countDownDate();
-  setInterval(countDownDate, 1000);
-
-})()
+}
